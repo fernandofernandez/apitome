@@ -1,5 +1,7 @@
 package org.apitome.core.operation;
 
+import org.apitome.core.model.Context;
+import org.apitome.core.model.OpContext;
 import org.apitome.core.service.DefaultServiceManager;
 import org.apitome.core.service.ServiceManager;
 import org.apitome.core.service.TestIntegerService;
@@ -12,6 +14,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 public class OperationTestBase {
 
+    protected Context context;
+
     protected  TestRequest request;
 
     protected ServiceManager serviceManager;
@@ -22,11 +26,12 @@ public class OperationTestBase {
         serviceManager.addService(STRING_SERVICE, new TestStringService());
         serviceManager.addService(INTEGER_SERVICE, new TestIntegerService());
         this.request = new TestRequest();
+        this.context = new OpContext();
     }
 
-    public <R, E extends Exception> E assertException(Operation<R, ?> operation, R request, Class<E> exceptionClass) {
+    public <R, E extends Exception> E assertException(Operation<R, ?> operation, R request, Context context, Class<E> exceptionClass) {
         try {
-            operation.execute(request);
+            operation.execute(request, context);
             fail("Expected exception " + exceptionClass.getCanonicalName() + " but no exception was thrown.");
         } catch (Exception e) {
             if (exceptionClass.isInstance(e)) {

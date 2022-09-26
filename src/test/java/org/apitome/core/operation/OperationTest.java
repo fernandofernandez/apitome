@@ -4,6 +4,7 @@ import org.apitome.core.action.AbstractAction;
 import org.apitome.core.action.ActionKey;
 import org.apitome.core.action.ExceptionHandler;
 import org.apitome.core.error.ServiceException;
+import org.apitome.core.model.Context;
 import org.apitome.core.service.TestIntegerService;
 import org.apitome.core.service.TestStringService;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,7 +59,7 @@ public class OperationTest extends OperationTestBase {
     public void testNormalOperation() {
         request.setIntValue(7);
         request.setStrValue("Fernando");
-        TestResponse result = operation.execute(request);
+        TestResponse result = operation.execute(request, context);
         assertEquals(107, result.getIntValue());
         assertEquals("Hello Fernando", result.getStrValue());
     }
@@ -68,7 +69,7 @@ public class OperationTest extends OperationTestBase {
         this.runAsync = true;
         request.setIntValue(7);
         request.setStrValue("Fernando");
-        TestResponse result = operation.execute(request);
+        TestResponse result = operation.execute(request, context);
         assertEquals(107, result.getIntValue());
         assertEquals("Hello Fernando", result.getStrValue());
     }
@@ -83,7 +84,7 @@ public class OperationTest extends OperationTestBase {
         when(integerService.sumIntegers(any())).thenThrow(rte);
         AtomicBoolean timeoutHandlerInvoked = new AtomicBoolean(false);
         this.timeoutHandler = (a, e) -> {timeoutHandlerInvoked.set(true); throw a.handleException(e);};
-        ServiceException result = assertException(operation, request, ServiceException.class);
+        ServiceException result = assertException(operation, request, context, ServiceException.class);
         assertNotNull(result);
         assertTrue(timeoutHandlerInvoked.get(), "Operation timeoutHandler not invoked");
         assertSame(timeout, result.getCause());
@@ -99,7 +100,7 @@ public class OperationTest extends OperationTestBase {
         AtomicBoolean exceptionHandlerInvoked = new AtomicBoolean(false);
         this.timeoutHandler = (a, e) -> {timeoutHandlerInvoked.set(true); throw a.handleException(e);};
         this.exceptionHandler = (a, e) -> {exceptionHandlerInvoked.set(true); throw (RuntimeException) e;};
-        IllegalArgumentException result = assertException(operation, request, IllegalArgumentException.class);
+        IllegalArgumentException result = assertException(operation, request, context, IllegalArgumentException.class);
         assertNotNull(result);
         assertFalse(timeoutHandlerInvoked.get(), "Operation timeoutHandler was invoked");
         assertTrue(exceptionHandlerInvoked.get(), "Operation exceptionHandler not invoked");
@@ -118,7 +119,7 @@ public class OperationTest extends OperationTestBase {
         this.runAsync = true;
         request.setIntValue(7);
         request.setStrValue("Fernando");
-        RuntimeException result = assertException(operation, request, RuntimeException.class);
+        RuntimeException result = assertException(operation, request, context, RuntimeException.class);
         assertNotNull(result);
         assertTrue(timeoutHandlerInvoked.get(), "Operation timeoutHandler not invoked");
         assertSame(timeout, result.getCause().getCause());
@@ -138,7 +139,7 @@ public class OperationTest extends OperationTestBase {
         this.runAsync = true;
         request.setIntValue(7);
         request.setStrValue("Fernando");
-        RuntimeException result = assertException(operation, request, RuntimeException.class);
+        RuntimeException result = assertException(operation, request, context, RuntimeException.class);
         assertNotNull(result);
         assertFalse(timeoutHandlerInvoked.get(), "Operation timeoutHandler was invoked");
         assertTrue(exceptionHandlerInvoked.get(), "Operation exceptionHandler not invoked");
@@ -148,7 +149,7 @@ public class OperationTest extends OperationTestBase {
     public class TestOperation extends AbstractOperation<TestRequest, TestResponse> {
 
         @Override
-        public TestResponse execute(TestRequest request) {
+        public TestResponse execute(TestRequest request, Context context) {
             Integer intValue;
             String strValue;
             if (runAsync) {
@@ -169,32 +170,32 @@ public class OperationTest extends OperationTestBase {
 
         private Integer performActionOne(TestRequest request) {
             if (timeoutHandler != null && exceptionHandler != null) {
-                return performAction(ACTION_ONE, request, timeoutHandler, exceptionHandler);
+                return performAction(ACTION_ONE, request, context, timeoutHandler, exceptionHandler);
             } else if (timeoutHandler != null && exceptionHandler == null) {
-                return performAction(ACTION_ONE, request, timeoutHandler);
+                return performAction(ACTION_ONE, request, context, timeoutHandler);
             } else {
-                return performAction(ACTION_ONE, request);
+                return performAction(ACTION_ONE, request, context);
             }
         }
 
         private String performActionTwo(TestRequest request) {
             if (timeoutHandler != null && exceptionHandler != null) {
-                return performAction(ACTION_TWO, request, timeoutHandler, exceptionHandler);
+                return performAction(ACTION_TWO, request, context, timeoutHandler, exceptionHandler);
             } else if (timeoutHandler != null && exceptionHandler == null) {
-                return performAction(ACTION_TWO, request, timeoutHandler);
+                return performAction(ACTION_TWO, request, context, timeoutHandler);
             } else {
-                return performAction(ACTION_TWO, request);
+                return performAction(ACTION_TWO, request, context);
             }
         }
 
         private Integer performActionOneAsync(TestRequest request) {
             try {
                 if (timeoutHandler != null && exceptionHandler != null) {
-                    return performActionAsync(ACTION_ONE, request, timeoutHandler, exceptionHandler).get();
+                    return performActionAsync(ACTION_ONE, request, context, timeoutHandler, exceptionHandler).get();
                 } else if (timeoutHandler != null && exceptionHandler == null) {
-                    return performActionAsync(ACTION_ONE, request, timeoutHandler).get();
+                    return performActionAsync(ACTION_ONE, request, context, timeoutHandler).get();
                 } else {
-                    return performActionAsync(ACTION_ONE, request).get();
+                    return performActionAsync(ACTION_ONE, request, context).get();
                 }
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
@@ -205,11 +206,11 @@ public class OperationTest extends OperationTestBase {
         private String performActionTwoAsync(TestRequest request) {
             try {
                 if (timeoutHandler != null && exceptionHandler != null) {
-                    return performActionAsync(ACTION_TWO, request, timeoutHandler, exceptionHandler).get();
+                    return performActionAsync(ACTION_TWO, request, context, timeoutHandler, exceptionHandler).get();
                 } else if (timeoutHandler != null && exceptionHandler == null) {
-                    return performActionAsync(ACTION_TWO, request, timeoutHandler).get();
+                    return performActionAsync(ACTION_TWO, request, context, timeoutHandler).get();
                 } else {
-                    return performActionAsync(ACTION_TWO, request).get();
+                    return performActionAsync(ACTION_TWO, request, context).get();
                 }
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
@@ -221,7 +222,7 @@ public class OperationTest extends OperationTestBase {
 
     public class TestActionOne extends AbstractAction<TestRequest, Integer> {
         @Override
-        public Integer invoke(TestRequest testRequest) throws TimeoutException, SocketTimeoutException {
+        public Integer invoke(TestRequest testRequest, Context context) throws TimeoutException, SocketTimeoutException {
             try {
                 return invokeService(INTEGER_SERVICE, s -> s.sumIntegers(testRequest.getIntValue(), 100));
             } catch (Exception e) {
@@ -244,7 +245,7 @@ public class OperationTest extends OperationTestBase {
 
     public class TestActionTwo extends AbstractAction<TestRequest, String> {
         @Override
-        public String invoke(TestRequest testRequest) throws TimeoutException, SocketTimeoutException {
+        public String invoke(TestRequest testRequest, Context context) throws TimeoutException, SocketTimeoutException {
             try {
                 return invokeService(STRING_SERVICE, s -> s.appendStrings("Hello ", testRequest.getStrValue()));
             } catch (Exception e) {

@@ -14,24 +14,15 @@
  * limitations under the License.
  */
 
-package org.apitome.core.logging;
+package org.apitome.core.model;
 
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
+import org.apitome.core.logging.LogFields;
 
-public interface LogKey {
+public interface Context {
 
-    String getId();
+    <T> void put(TypeKey<T> key, T value);
 
-    ResourceBundle getLogKeys();
+    <T> T get(TypeKey<T> key);
 
-    default String getKeyName() {
-        String keyName = getId();
-        ResourceBundle logKeys = getLogKeys();
-        try {
-            return logKeys.getString(keyName);
-        } catch (MissingResourceException mre) {
-            return keyName;
-        }
-    }
+    LogFields getCommonLogFields();
 }
