@@ -14,25 +14,27 @@
  * limitations under the License.
  */
 
-package org.apitome.core.error;
+package org.apitome.core.model;
 
-/**
- * ApplicationError represents an error within the microservice
- * <p/>
- * An application error has an internal identifier and two messages associated with it: a
- * message intended for the user, which can be potentially displayed in a user interface;
- * and a message intended for developers, which carries application details that would be
- * meaningless to a user.
- */
-public interface ApplicationError {
+public class TestResponse {
 
-    String getId();
+    private Integer intValue;
 
-    String getMessage();
+    private String strValue;
 
-    String getMessage(String... args);
+    public Integer getIntValue() {
+        return intValue;
+    }
 
-    String getDeveloperMessage();
+    public void setIntValue(Integer intValue) {
+        this.intValue = intValue;
+    }
 
-    String getDeveloperMessage(String... args);
+    public String getStrValue() {
+        return strValue;
+    }
+
+    public void setStrValue(String strValue) {
+        this.strValue = strValue;
+    }
 }

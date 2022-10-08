@@ -2,6 +2,7 @@ package org.apitome.core.operation;
 
 import org.apitome.core.model.Context;
 import org.apitome.core.model.OpContext;
+import org.apitome.core.model.TestRequest;
 import org.apitome.core.service.DefaultServiceManager;
 import org.apitome.core.service.ServiceManager;
 import org.apitome.core.service.TestIntegerService;
@@ -16,7 +17,7 @@ public class OperationTestBase {
 
     protected Context context;
 
-    protected  TestRequest request;
+    protected TestRequest request;
 
     protected ServiceManager serviceManager;
 
@@ -41,51 +42,5 @@ public class OperationTestBase {
             }
         }
         return null;
-    }
-
-    public class TestRequest {
-
-        private Integer intValue;
-
-        private String strValue;
-
-        public Integer getIntValue() {
-            return intValue;
-        }
-
-        public void setIntValue(Integer intValue) {
-            this.intValue = intValue;
-        }
-
-        public String getStrValue() {
-            return strValue;
-        }
-
-        public void setStrValue(String strValue) {
-            this.strValue = strValue;
-        }
-    }
-
-    public class TestResponse {
-
-        private Integer intValue;
-
-        private String strValue;
-
-        public Integer getIntValue() {
-            return intValue;
-        }
-
-        public void setIntValue(Integer intValue) {
-            this.intValue = intValue;
-        }
-
-        public String getStrValue() {
-            return strValue;
-        }
-
-        public void setStrValue(String strValue) {
-            this.strValue = strValue;
-        }
     }
 }

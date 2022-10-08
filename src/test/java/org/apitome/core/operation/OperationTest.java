@@ -5,6 +5,8 @@ import org.apitome.core.action.ActionKey;
 import org.apitome.core.action.ExceptionHandler;
 import org.apitome.core.error.ServiceException;
 import org.apitome.core.model.Context;
+import org.apitome.core.model.TestRequest;
+import org.apitome.core.model.TestResponse;
 import org.apitome.core.service.TestIntegerService;
 import org.apitome.core.service.TestStringService;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,7 +47,7 @@ public class OperationTest extends OperationTestBase {
         this.runAsync = false;
         this.timeoutHandler = null;
         this.exceptionHandler = null;
-        this.operation = new TestOperation();
+        this.operation = new SimpleOperation();
         operation.setServiceManager(serviceManager);
         this.actionOne = new TestActionOne();
         actionOne.setServiceManager(serviceManager);
@@ -146,7 +148,7 @@ public class OperationTest extends OperationTestBase {
         assertSame(iae, result.getCause());
     }
 
-    public class TestOperation extends AbstractOperation<TestRequest, TestResponse> {
+    public class SimpleOperation extends TestOperation {
 
         @Override
         public TestResponse execute(TestRequest request, Context context) {

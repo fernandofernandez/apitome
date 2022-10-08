@@ -16,23 +16,9 @@
 
 package org.apitome.core.error;
 
-/**
- * ApplicationError represents an error within the microservice
- * <p/>
- * An application error has an internal identifier and two messages associated with it: a
- * message intended for the user, which can be potentially displayed in a user interface;
- * and a message intended for developers, which carries application details that would be
- * meaningless to a user.
- */
-public interface ApplicationError {
+public class ConfigurationException extends RuntimeException {
 
-    String getId();
-
-    String getMessage();
-
-    String getMessage(String... args);
-
-    String getDeveloperMessage();
-
-    String getDeveloperMessage(String... args);
+    public ConfigurationException(Exception e) {
+        super(e);
+    }
 }

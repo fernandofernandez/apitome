@@ -14,25 +14,26 @@
  * limitations under the License.
  */
 
-package org.apitome.core.error;
+package org.apitome.core.metadata;
 
-/**
- * ApplicationError represents an error within the microservice
- * <p/>
- * An application error has an internal identifier and two messages associated with it: a
- * message intended for the user, which can be potentially displayed in a user interface;
- * and a message intended for developers, which carries application details that would be
- * meaningless to a user.
- */
-public interface ApplicationError {
+import java.io.InputStream;
 
-    String getId();
+public class TemplateInput {
 
-    String getMessage();
+    private final String templateName;
 
-    String getMessage(String... args);
+    private final InputStream inputStream;
 
-    String getDeveloperMessage();
+    public TemplateInput(String templateName, InputStream inputStream) {
+        this.templateName = templateName;
+        this.inputStream = inputStream;
+    }
 
-    String getDeveloperMessage(String... args);
+    public String getTemplateName() {
+        return templateName;
+    }
+
+    public InputStream getInputStream() {
+        return inputStream;
+    }
 }
