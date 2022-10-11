@@ -16,7 +16,7 @@
 
 package org.apitome.core.metadata;
 
-import org.apitome.core.expression.PropertyResolver;
+import org.apitome.core.expression.SimpleResolver;
 import org.apitome.core.expression.Resolver;
 import org.apitome.core.model.TestOperationDescription;
 import org.apitome.core.model._TestOperationDescription;
@@ -34,7 +34,7 @@ public class SimpleRegistryTest {
     @BeforeEach
     public void setup() {
         this.properties = new Properties();
-        this.registry = new TestSimpleRegistry(new PropertyResolver(properties));
+        this.registry = new TestSimpleRegistry(new SimpleResolver(properties));
     }
 
     @Test
