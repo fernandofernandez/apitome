@@ -23,44 +23,49 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PushbackReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
-public class Template {
-
-    private List<Expression> expressions;
+public class Template extends AbstractExpression {
 
     private final String name;
 
     public Template(String name) {
+        super();
         this.name = name;
-        this.expressions = new ArrayList<>();
     }
 
     public String getName() {
         return name;
     }
 
-    protected void appendString(String string) {
-        expressions.add(new ImmutableExpression(string));
+    @Override
+    public void resolveImmediate(Resolver resolver) {
+        List<Expression> expressions = getExpressions();
+        for (int i = 0; i < expressions.size(); i++) {
+            Expression expression = expressions.get(i);
+            if (expression instanceof ImmediateExpression) {
+                String resolved = expression.resolve(resolver);
+                expressions.set(i, new ImmutableExpression(resolved));
+            }
+        }
     }
 
-    protected void appendExpression(String expression) {
-        expressions.add(new ComplexExpression(expression));
-    }
-
-    public String toString(Resolver resolver) {
+    @Override
+    public String resolve(Resolver resolver) {
         StringBuilder builder = new StringBuilder();
-        expressions.forEach(expression -> builder.append(expression.accept(resolver)));
+        getExpressions().forEach(expression -> builder.append(expression.resolve(resolver)));
         return builder.toString();
     }
 
     public static Template from(String name, InputStream inputStream) {
+        Template template = new Template(name);
         try (InputStreamReader streamReader = new InputStreamReader(inputStream);
-             BufferedReader reader = new BufferedReader(streamReader)) {
-            Template builder = new Template(name);
-            reader.lines().forEach(l -> parseExpressions(l, builder));
-            return builder;
+             PushbackReader pbReader = new PushbackReader(streamReader, 2)) {
+            processExpression(template, pbReader, t -> t != null);
+            return template;
         } catch (IOException e) {
             throw new ConfigurationException(e);
         } finally {
@@ -71,22 +76,105 @@ public class Template {
         }
     }
 
-    private static void parseExpressions(String line, Template template) {
-        int start = 0;
-        int end;
-        int ix = line.indexOf("${");
-        while (ix > -1) {
-            end = line.indexOf('}', ix+2);
-            if (end > -1) {
-                template.appendString(line.substring(start, ix));
-                template.appendExpression(line.substring(ix+2, end));
-                start = end + 1;
+    private static boolean processExpression(AbstractExpression expression, PushbackReader pbReader, Predicate<String> predicate) {
+        StringBuilder builder = new StringBuilder(132);
+        String token = nextToken(builder, pbReader);
+        boolean eof;
+        while (predicate.test(token)) {
+            if (token.startsWith("${") && token.endsWith("}")) {
+                ImmediateExpression immediateExpression = createImmediateExpression(token);
+                expression.addExpression(immediateExpression);
+            } else if (token.startsWith("#{") && token.endsWith("}")) {
+                DeferredExpression deferredExpression = createDeferredExpression(token);
+                expression.addExpression(deferredExpression);
+            } else if (token.startsWith("${") && !token.endsWith("}")) {
+                ImmediateExpression immediateExpression = createImmediateExpression(token);
+                expression.addExpression(immediateExpression);
+                eof = processExpression(immediateExpression, pbReader,
+                        t -> t != null && !(t.endsWith("}") && !t.startsWith("${") && !t.startsWith("#{")));
+                if (eof) {
+                    return true;
+                }
+            } else if (token.startsWith("#{") && !token.endsWith("}")) {
+                DeferredExpression deferredExpression = createDeferredExpression(token);
+                expression.addExpression(deferredExpression);
+                eof = processExpression(deferredExpression, pbReader,
+                        t -> t != null && !(t.endsWith("}") && !t.startsWith("${") && !t.startsWith("#{")));
+                if (eof) {
+                    return true;
+                }
             } else {
-                template.appendString(line.substring(start, ix+2));
-                start = ix + 2;
+                ImmutableExpression immutableExpression = new ImmutableExpression(token);
+                expression.addExpression(immutableExpression);
             }
-            ix = line.indexOf("${");
+            builder.setLength(0);
+            token = nextToken(builder, pbReader);
         }
-        template.appendString(line.substring(start) + "\n");
+        if (token == null) {
+            return true;
+        }
+        return false;
+    }
+
+    private static ImmediateExpression createImmediateExpression(String constant) {
+        ImmediateExpression immediateExpression = new ImmediateExpression();
+        ImmutableExpression immutableExpression = new ImmutableExpression(constant);
+        immediateExpression.addExpression(immutableExpression);
+        return immediateExpression;
+    }
+
+    private static DeferredExpression createDeferredExpression(String constant) {
+        DeferredExpression deferredExpression = new DeferredExpression();
+        ImmutableExpression immutableExpression = new ImmutableExpression(constant);
+        deferredExpression.addExpression(immutableExpression);
+        return deferredExpression;
+    }
+
+    private static String nextToken(StringBuilder builder, PushbackReader reader) {
+        boolean isExpression = false;
+        try {
+            int c = reader.read();
+            while (c != -1) {
+                char ch = (char) c;
+                if (ch == '$' || ch == '#') {
+                    c = reader.read();
+                    if (c != -1) {
+                        char delimiter = (char) c;
+                        if (delimiter == '{') {
+                            if (builder.length() == 0) {
+                                builder.append(ch);
+                                builder.append(delimiter);
+                                isExpression = true;
+                            } else {
+                                reader.unread(delimiter);
+                                reader.unread(ch);
+                                return builder.toString();
+                            }
+                        } else {
+                            builder.append(ch);
+                            builder.append(delimiter);
+                        }
+                    } else {
+                        builder.append(ch);
+                        return builder.toString();
+                    }
+                } else if (ch == '}') {
+                    builder.append(ch);
+                    if (isExpression) {
+                        return builder.toString();
+                    }
+                } else {
+                    builder.append(ch);
+                }
+                c = reader.read();
+            }
+            if (builder.length() == 0) {
+                return null;
+            } else {
+                return builder.toString();
+            }
+        } catch (IOException e) {
+            throw new ConfigurationException(e);
+        }
     }
 }

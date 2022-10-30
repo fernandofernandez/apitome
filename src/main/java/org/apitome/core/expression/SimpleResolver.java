@@ -16,6 +16,8 @@
 
 package org.apitome.core.expression;
 
+import org.apitome.core.error.ConfigurationException;
+
 import java.util.Properties;
 
 public class SimpleResolver implements Resolver {
@@ -28,6 +30,12 @@ public class SimpleResolver implements Resolver {
 
     @Override
     public String processExpression(String expression) {
-        return properties.getProperty(expression);
+        if (expression != null && (expression.startsWith("${") || expression.startsWith("#{")) && expression.endsWith("}")) {
+            String propertyKey = expression.substring(2, expression.length() - 1);
+            Object value = properties.get(propertyKey);
+            return String.valueOf(value);
+        } else {
+            throw new ConfigurationException(new RuntimeException("Invalid expression"));
+        }
     }
 }

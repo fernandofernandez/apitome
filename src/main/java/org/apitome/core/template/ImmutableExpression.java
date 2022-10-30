@@ -27,7 +27,12 @@ public class ImmutableExpression implements Expression {
     }
 
     @Override
-    public String accept(Resolver resolver) {
+    public void resolveImmediate(Resolver resolver) {
+        // No immediate expression to resolve
+    }
+
+    @Override
+    public String resolve(Resolver resolver) {
         return value;
     }
 }

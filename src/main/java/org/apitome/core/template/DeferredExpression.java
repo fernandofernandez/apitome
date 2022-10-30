@@ -18,9 +18,10 @@ package org.apitome.core.template;
 
 import org.apitome.core.expression.Resolver;
 
-public interface Expression {
+public class DeferredExpression extends AbstractExpression {
 
-    void resolveImmediate(Resolver resolver);
+    @Override
+    public void resolveImmediate(Resolver resolver) {
 
-    String resolve(Resolver resolver);
+    }
 }

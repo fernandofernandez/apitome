@@ -112,7 +112,7 @@ public abstract class AbstractRegistry<D, R extends Transformable<D, T>, T exten
      * @return a raw description
      */
     protected R getRawDescriptionAsJson(Template template) {
-        return getRawDescription(template, t -> jsonMapper.readValue(t.toString(getResolver()), getRawDescriptionClass()));
+        return getRawDescription(template, t -> jsonMapper.readValue(t.resolve(getResolver()), getRawDescriptionClass()));
     }
 
     /**
@@ -122,7 +122,7 @@ public abstract class AbstractRegistry<D, R extends Transformable<D, T>, T exten
      * @return a raw description
      */
     protected R getRawDescriptionAsYaml(Template template) {
-        return getRawDescription(template, t -> yamlMapper.readValue(t.toString(getResolver()), getRawDescriptionClass()));
+        return getRawDescription(template, t -> yamlMapper.readValue(t.resolve(getResolver()), getRawDescriptionClass()));
     }
 
     /**

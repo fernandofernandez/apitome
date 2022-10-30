@@ -18,18 +18,30 @@ package org.apitome.core.template;
 
 import org.apitome.core.expression.Resolver;
 
-public class ComplexExpression implements Expression {
-    private final String expression;
+import java.util.ArrayList;
+import java.util.List;
 
-    protected ComplexExpression(String expression) {
-        this.expression = expression;
+public abstract class AbstractExpression implements Expression {
+
+    private List<Expression> expressions;
+
+    protected AbstractExpression() {
+        this.expressions = new ArrayList<>();
     }
 
     @Override
-    public String accept(Resolver resolver) {
-        if (resolver == null) {
-            return "null";
-        }
+    public String resolve(Resolver resolver) {
+        StringBuilder builder = new StringBuilder();
+        getExpressions().forEach(expression -> builder.append(expression.resolve(resolver)));
+        String expression = builder.toString();
         return resolver.processExpression(expression);
+    }
+
+    protected void addExpression(Expression expression) {
+        this.expressions.add(expression);
+    }
+
+    protected List<Expression> getExpressions() {
+        return expressions;
     }
 }

@@ -56,7 +56,7 @@ public class ExpressionFunctionMapper extends FunctionMapper {
     @Override
     public Method resolveFunction(String prefix, String localName) {
         builder.setLength(0);
-        if (prefix != null) {
+        if (prefix != null && prefix.length() > 0) {
             builder.append(prefix);
             builder.append(':');
         }
