@@ -64,7 +64,7 @@ public class Template extends AbstractExpression {
         Template template = new Template(name);
         try (InputStreamReader streamReader = new InputStreamReader(inputStream);
              PushbackReader pbReader = new PushbackReader(streamReader, 2)) {
-            processExpression(template, pbReader, t -> t != null);
+            processExpression(template, pbReader, false);
             return template;
         } catch (IOException e) {
             throw new ConfigurationException(e);
@@ -76,9 +76,15 @@ public class Template extends AbstractExpression {
         }
     }
 
-    private static boolean processExpression(AbstractExpression expression, PushbackReader pbReader, Predicate<String> predicate) {
+    private static boolean processExpression(AbstractExpression expression, PushbackReader pbReader, boolean inExpression) {
+        Predicate<String> predicate;
+        if (inExpression) {
+            predicate = token -> token != null && !token.equals("}");
+        } else {
+            predicate = token -> token != null;
+        }
         StringBuilder builder = new StringBuilder(132);
-        String token = nextToken(builder, pbReader);
+        String token = nextToken(builder, pbReader, inExpression);
         boolean eof;
         while (predicate.test(token)) {
             if (token.startsWith("${") && token.endsWith("}")) {
@@ -90,16 +96,14 @@ public class Template extends AbstractExpression {
             } else if (token.startsWith("${") && !token.endsWith("}")) {
                 ImmediateExpression immediateExpression = createImmediateExpression(token);
                 expression.addExpression(immediateExpression);
-                eof = processExpression(immediateExpression, pbReader,
-                        t -> t != null && !(t.endsWith("}") && !t.startsWith("${") && !t.startsWith("#{")));
+                eof = processExpression(immediateExpression, pbReader, true);
                 if (eof) {
                     return true;
                 }
             } else if (token.startsWith("#{") && !token.endsWith("}")) {
                 DeferredExpression deferredExpression = createDeferredExpression(token);
                 expression.addExpression(deferredExpression);
-                eof = processExpression(deferredExpression, pbReader,
-                        t -> t != null && !(t.endsWith("}") && !t.startsWith("${") && !t.startsWith("#{")));
+                eof = processExpression(deferredExpression, pbReader, true);
                 if (eof) {
                     return true;
                 }
@@ -108,10 +112,13 @@ public class Template extends AbstractExpression {
                 expression.addExpression(immutableExpression);
             }
             builder.setLength(0);
-            token = nextToken(builder, pbReader);
+            token = nextToken(builder, pbReader, inExpression);
         }
         if (token == null) {
             return true;
+        } else {
+            ImmutableExpression immutableExpression = new ImmutableExpression(token);
+            expression.addExpression(immutableExpression);
         }
         return false;
     }
@@ -130,8 +137,7 @@ public class Template extends AbstractExpression {
         return deferredExpression;
     }
 
-    private static String nextToken(StringBuilder builder, PushbackReader reader) {
-        boolean isExpression = false;
+    private static String nextToken(StringBuilder builder, PushbackReader reader, boolean inExpression) {
         try {
             int c = reader.read();
             while (c != -1) {
@@ -144,11 +150,10 @@ public class Template extends AbstractExpression {
                             if (builder.length() == 0) {
                                 builder.append(ch);
                                 builder.append(delimiter);
-                                isExpression = true;
                             } else {
                                 reader.unread(delimiter);
                                 reader.unread(ch);
-                                return builder.toString();
+                                break;
                             }
                         } else {
                             builder.append(ch);
@@ -156,20 +161,35 @@ public class Template extends AbstractExpression {
                         }
                     } else {
                         builder.append(ch);
-                        return builder.toString();
+                        break;
                     }
                 } else if (ch == '}') {
-                    builder.append(ch);
-                    if (isExpression) {
-                        return builder.toString();
+                    if ((builder.length() > 2) &&
+                            (builder.charAt(0) == '$' || builder.charAt(0) == '#') &&
+                            builder.charAt(1) == '{') {
+                        builder.append(ch);
+                        break;
+                    } else if (!inExpression) {
+                        builder.append(ch);
+                    } else {
+                        if (builder.length() == 0) {
+                            builder.append(ch);
+                            break;
+                        } else {
+                            reader.unread(ch);
+                            break;
+                        }
                     }
                 } else {
                     builder.append(ch);
                 }
                 c = reader.read();
             }
-            if (builder.length() == 0) {
-                return null;
+            if (c == -1) {
+                if (builder.length() == 0) {
+                    return null;
+                }
+                return builder.toString();
             } else {
                 return builder.toString();
             }

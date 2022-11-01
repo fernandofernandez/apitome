@@ -44,7 +44,7 @@ public class TemplateTest {
     }
 
     @Test
-    public void testSimpleGTemplate() throws IOException {
+    public void testSimpleTemplate() throws IOException {
         Resource resource = resourceResolver.getResource("template/simple-template.json");
         Template template = Template.from("simple", resource.getInputStream());
         assertEquals("simple", template.getName());
@@ -69,4 +69,25 @@ public class TemplateTest {
         assertTrue(result.contains("\"strValue\": \"4\""));
     }
 
+    @Test
+    public void testEmbeddedTemplate() throws IOException {
+        Resource resource = resourceResolver.getResource("template/embedded-template.json");
+        Template template = Template.from("embedded", resource.getInputStream());
+        assertEquals("embedded", template.getName());
+        assertEquals(5, template.getExpressions().size());
+        assertTrue(template.getExpressions().get(0) instanceof ImmutableExpression);
+        assertTrue(template.getExpressions().get(1) instanceof ImmediateExpression);
+        assertTrue(template.getExpressions().get(2) instanceof ImmutableExpression);
+        assertTrue(template.getExpressions().get(3) instanceof DeferredExpression);
+        assertTrue(template.getExpressions().get(4) instanceof ImmutableExpression);
+        properties.put("propertyOne", "property");
+        properties.put("propertyTwo", "five");
+        properties.put("property.five", "epitome");
+        properties.put("propertyThree", "property");
+        properties.put("propertyFour", "Five");
+        properties.put("propertyFive", "apitome");
+        String result = template.resolve(simpleResolver);
+        assertTrue(result.contains("\"type\": \"epitome\","));
+        assertTrue(result.contains("\"strValue\": \"apitome\""));
+    }
 }
