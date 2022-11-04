@@ -16,12 +16,6 @@
 
 package org.apitome.core.template;
 
-import org.apitome.core.expression.Resolver;
+public class DeferredExpression extends CompositeExpression {
 
-public class DeferredExpression extends AbstractExpression {
-
-    @Override
-    public void resolveImmediate(Resolver resolver) {
-
-    }
 }

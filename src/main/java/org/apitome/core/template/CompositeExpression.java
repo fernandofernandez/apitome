@@ -20,13 +20,36 @@ import org.apitome.core.expression.Resolver;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-public abstract class AbstractExpression implements Expression {
+/**
+ * CompositeExpression represents a expressions that contains embedded expressions
+ */
+public abstract class CompositeExpression implements Expression {
 
     private List<Expression> expressions;
 
-    protected AbstractExpression() {
+    protected CompositeExpression() {
         this.expressions = new ArrayList<>();
+    }
+
+    @Override
+    public void resolveImmediate(Resolver resolver) {
+        List<Expression> expressions = getExpressions();
+        for (int i = 0; i < expressions.size(); i++) {
+            Expression expression = expressions.get(i);
+            expression.resolveImmediate(resolver);
+            if (expression instanceof ImmediateExpression) {
+                ImmediateExpression immediateExpression = (ImmediateExpression) expression;
+                AtomicBoolean onlyImmutable = new AtomicBoolean(true);
+                immediateExpression.getExpressions()
+                        .forEach(e -> { if (!(e instanceof ImmutableExpression)) onlyImmutable.set(false);});
+                if (onlyImmutable.get()) {
+                    String resolved = expression.resolve(resolver);
+                    expressions.set(i, new ImmutableExpression(resolved));
+                }
+            }
+        }
     }
 
     @Override

@@ -16,8 +16,8 @@
 
 package org.apitome.core.metadata;
 
-import org.apitome.core.expression.SimpleResolver;
 import org.apitome.core.expression.Resolver;
+import org.apitome.core.expression.SimpleResolver;
 import org.apitome.core.model.TestOperationDescription;
 import org.apitome.core.model._TestOperationDescription;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,29 +26,40 @@ import org.junit.jupiter.api.Test;
 import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class SimpleRegistryTest {
+public class CachedRegistryTest {
 
     private Properties properties;
 
-    private SimpleRegistry<TestOperationDescription, _TestOperationDescription, OperationDescriptionTransformer> registry;
+    private CachedRegistry<TestOperationDescription, _TestOperationDescription, OperationDescriptionTransformer> registry;
 
     @BeforeEach
     public void setup() {
         this.properties = new Properties();
-        this.registry = new TestSimpleRegistry(new SimpleResolver(properties));
+        this.registry = new TestCachedRegistry(new SimpleResolver(properties));
     }
 
     @Test
     public void testGetDescription() {
-        registry.processResources("test/operation/*");
+        registry.processResources("test/operation/*.*");
         TestOperationDescription result = registry.getDescription("testoperationA");
+        assertNotNull(result);
+        result = registry.getDescription("testoperationA");
         assertNotNull(result);
     }
 
-    public class TestSimpleRegistry extends SimpleRegistry<TestOperationDescription, _TestOperationDescription, OperationDescriptionTransformer> {
+    @Test
+    public void testGetDescriptionNotFound() {
+        registry.processResources("test/operation/*.*");
+        TestOperationDescription result = registry.getDescription("notfound");
+        assertNull(result);
+    }
 
-        public TestSimpleRegistry(Resolver resolver) {
+    public class TestCachedRegistry extends CachedRegistry<TestOperationDescription, _TestOperationDescription, OperationDescriptionTransformer> {
+
+
+        public TestCachedRegistry(Resolver resolver) {
             super(_TestOperationDescription.class, new OperationDescriptionTransformer(), resolver);
         }
     }

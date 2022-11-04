@@ -19,16 +19,24 @@ package org.apitome.core.template;
 import org.apitome.core.error.ConfigurationException;
 import org.apitome.core.expression.Resolver;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PushbackReader;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
-public class Template extends AbstractExpression {
+/**
+ * Template represents a JSON or YAML document that contains resolvable expressions.
+ * These expressions may be resolved in two phases, which are implementation-dependent.
+ * <ul>
+ *     <li>an immediate expression is resolved in a first pass; example: ${expression}
+ *     <li>a deferred expression is resolved in a second pass; example: #{expression}
+ * </ul>
+ *
+ */
+public class Template extends CompositeExpression {
 
     private final String name;
 
@@ -39,18 +47,6 @@ public class Template extends AbstractExpression {
 
     public String getName() {
         return name;
-    }
-
-    @Override
-    public void resolveImmediate(Resolver resolver) {
-        List<Expression> expressions = getExpressions();
-        for (int i = 0; i < expressions.size(); i++) {
-            Expression expression = expressions.get(i);
-            if (expression instanceof ImmediateExpression) {
-                String resolved = expression.resolve(resolver);
-                expressions.set(i, new ImmutableExpression(resolved));
-            }
-        }
     }
 
     @Override
@@ -76,7 +72,7 @@ public class Template extends AbstractExpression {
         }
     }
 
-    private static boolean processExpression(AbstractExpression expression, PushbackReader pbReader, boolean inExpression) {
+    private static boolean processExpression(CompositeExpression expression, PushbackReader pbReader, boolean inExpression) {
         Predicate<String> predicate;
         if (inExpression) {
             predicate = token -> token != null && !token.equals("}");
@@ -87,23 +83,13 @@ public class Template extends AbstractExpression {
         String token = nextToken(builder, pbReader, inExpression);
         boolean eof;
         while (predicate.test(token)) {
-            if (token.startsWith("${") && token.endsWith("}")) {
-                ImmediateExpression immediateExpression = createImmediateExpression(token);
-                expression.addExpression(immediateExpression);
-            } else if (token.startsWith("#{") && token.endsWith("}")) {
-                DeferredExpression deferredExpression = createDeferredExpression(token);
-                expression.addExpression(deferredExpression);
-            } else if (token.startsWith("${") && !token.endsWith("}")) {
-                ImmediateExpression immediateExpression = createImmediateExpression(token);
-                expression.addExpression(immediateExpression);
-                eof = processExpression(immediateExpression, pbReader, true);
-                if (eof) {
-                    return true;
-                }
-            } else if (token.startsWith("#{") && !token.endsWith("}")) {
-                DeferredExpression deferredExpression = createDeferredExpression(token);
-                expression.addExpression(deferredExpression);
-                eof = processExpression(deferredExpression, pbReader, true);
+            if ((token.startsWith("${") || token.startsWith("#{")) && token.endsWith("}")) {
+                CompositeExpression compositeExpression = createCompositeExpression(token);
+                expression.addExpression(compositeExpression);
+            } else if ((token.startsWith("${") || token.startsWith("#{")) && !token.endsWith("}")) {
+                CompositeExpression compositeExpression = createCompositeExpression(token);
+                expression.addExpression(compositeExpression);
+                eof = processExpression(compositeExpression, pbReader, true);
                 if (eof) {
                     return true;
                 }
@@ -123,18 +109,16 @@ public class Template extends AbstractExpression {
         return false;
     }
 
-    private static ImmediateExpression createImmediateExpression(String constant) {
-        ImmediateExpression immediateExpression = new ImmediateExpression();
+    private static CompositeExpression createCompositeExpression(String constant) {
+        CompositeExpression expression;
+        if (constant.startsWith("${")) {
+            expression = new ImmediateExpression();
+        } else {
+            expression = new DeferredExpression();
+        }
         ImmutableExpression immutableExpression = new ImmutableExpression(constant);
-        immediateExpression.addExpression(immutableExpression);
-        return immediateExpression;
-    }
-
-    private static DeferredExpression createDeferredExpression(String constant) {
-        DeferredExpression deferredExpression = new DeferredExpression();
-        ImmutableExpression immutableExpression = new ImmutableExpression(constant);
-        deferredExpression.addExpression(immutableExpression);
-        return deferredExpression;
+        expression.addExpression(immutableExpression);
+        return expression;
     }
 
     private static String nextToken(StringBuilder builder, PushbackReader reader, boolean inExpression) {

@@ -16,21 +16,6 @@
 
 package org.apitome.core.template;
 
-import org.apitome.core.expression.Resolver;
+public class ImmediateExpression extends CompositeExpression {
 
-import java.util.List;
-
-public class ImmediateExpression extends AbstractExpression {
-
-    @Override
-    public void resolveImmediate(Resolver resolver) {
-        List<Expression> expressions = getExpressions();
-        for (int i = 0; i < expressions.size(); i++) {
-            Expression expression = expressions.get(i);
-            if (expression instanceof ImmediateExpression) {
-                String resolved = expression.resolve(resolver);
-                expressions.set(i, new ImmutableExpression(resolved));
-            }
-        }
-    }
 }

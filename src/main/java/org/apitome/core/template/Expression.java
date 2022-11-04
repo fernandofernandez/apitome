@@ -18,9 +18,23 @@ package org.apitome.core.template;
 
 import org.apitome.core.expression.Resolver;
 
+/**
+ * Expression is a string that may be resolved by a resolver
+ */
 public interface Expression {
 
+    /**
+     * Resolve immediate expressions within the expression, including perhaps this expression.
+     *
+     * @param resolver the resolver to resolve expression
+     */
     void resolveImmediate(Resolver resolver);
 
+    /**
+     * Resolve expressions within this expressions, including perhaps this expression.
+     *
+     * @param resolver the resolver to resolve expressions
+     * @return the resulting value
+     */
     String resolve(Resolver resolver);
 }

@@ -41,7 +41,7 @@ public class SimpleRegistry<D, R extends Transformable<D, T>, T extends Transfor
     public void processResources(String locationPattern) {
         Stream<Template> templates = getResources(locationPattern);
         Map<String, D> descriptions = templates
-                .collect(toMap(template -> getTemplateName(template.getName()), template -> processTemplate(template)));
+                .collect(toMap(template -> getTemplateName(template.getName()).toLowerCase(), template -> processTemplate(template)));
         descriptionMap.putAll(descriptions);
     }
 

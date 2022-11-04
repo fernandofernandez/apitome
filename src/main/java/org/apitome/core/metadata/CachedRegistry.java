@@ -60,7 +60,7 @@ public class CachedRegistry <D, R extends Transformable<D, T>, T extends Transfo
     public void processResources(String locationPattern) {
         Stream<Template> templates = getResources(locationPattern);
         Map<String, Template> descriptions = templates
-                .collect(toMap(template -> getTemplateName(template.getName()), template -> template));
+                .collect(toMap(template -> getTemplateName(template.getName()).toLowerCase(), template -> template));
         templateMap.putAll(descriptions);
     }
 
