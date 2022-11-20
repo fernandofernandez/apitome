@@ -1,0 +1,2 @@
+rootProject.name = 'apitome'
+include ':core', ':samples:reactive-app', ':samples:servlet-app'
