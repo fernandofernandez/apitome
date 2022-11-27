@@ -75,8 +75,9 @@ public class InputSpliterator implements Spliterator<Template> {
         }
         this.maxConcurrency -= 1;
         int newEnd = begin + partitionSize;
+        InputSpliterator partition = new InputSpliterator(inputs, begin, newEnd);
         this.begin = newEnd;
-        return new InputSpliterator(inputs, begin, newEnd);
+        return partition;
     }
 
     @Override
@@ -86,6 +87,6 @@ public class InputSpliterator implements Spliterator<Template> {
 
     @Override
     public int characteristics() {
-        return ORDERED | SIZED | SUBSIZED;
+        return  SIZED | SUBSIZED;
     }
 }

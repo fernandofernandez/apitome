@@ -18,7 +18,11 @@ package org.apitome.core.error;
 
 public class ConfigurationException extends RuntimeException {
 
-    public ConfigurationException(Exception e) {
+    public ConfigurationException(Throwable e) {
         super(e);
+    }
+
+    public ConfigurationException(ApplicationError applicationError, Throwable e) {
+        super(applicationError.getDeveloperMessage(), e);
     }
 }

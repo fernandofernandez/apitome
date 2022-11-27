@@ -33,8 +33,6 @@ public class ExpressionFunctionMapper extends FunctionMapper {
 
     private static ZoneId zoneId = ZoneId.systemDefault();
 
-    private static Instant now = Instant.now();
-
     private static DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     private final StringBuilder builder;
@@ -69,11 +67,13 @@ public class ExpressionFunctionMapper extends FunctionMapper {
     }
 
     public static String today() {
+        Instant now = Instant.now();
         LocalDateTime localDateTime = LocalDateTime.ofInstant(now, zoneId);
         return dateFormatter.format(localDateTime);
     }
 
     public static String todayPlusDays(Long days) {
+        Instant now = Instant.now();
         LocalDateTime localDateTime = LocalDateTime.ofInstant(now.plus(days, DAYS), zoneId);
         return dateFormatter.format(localDateTime);
     }
