@@ -27,7 +27,8 @@ dependencies {
     implementation 'org.springframework:spring-core:5.3.23'
     implementation 'org.glassfish:jakarta.el:3.0.4'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.0'
+    implementation libs.bundles.junit
+//     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.0'
     testImplementation 'ch.qos.logback:logback-core:1.2.11'
     testImplementation 'ch.qos.logback:logback-classic:1.2.11'
     testImplementation 'ch.qos.logback:logback-classic:1.2.11'

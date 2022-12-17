@@ -28,9 +28,10 @@ testing {
             dependencies {
                 implementation 'org.springframework.boot:spring-boot-starter-test'
                 implementation 'io.projectreactor:reactor-test'
-                implementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
-                implementation 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
-                implementation 'org.junit.vintage:junit-vintage-engine:5.7.0'
+                implementation libs.bundles.junit
+                // implementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+                // implementation 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+                // implementation 'org.junit.vintage:junit-vintage-engine:5.7.0'
             }
         }
         integrationTest(JvmTestSuite) {
