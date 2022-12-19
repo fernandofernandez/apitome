@@ -6,15 +6,15 @@ services:
     image: postgres
     restart: always
     environment:
-      - POSTGRES_DB=sor-db
+      - POSTGRES_DB=sordb
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgrespassword
       - PGDATA=/var/lib/postgresql/data/pgdata
     ports:
       - 5432:5432
     volumes:
-      - ./sor-service/db/data:/var/lib/postgresql
-      - ./sor-service/db/scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./samples/sor-service/db/data:/var/lib/postgresql
+      - ./samples/sor-service/db/scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
 
   pgadmin:
     image: dpage/pgadmin4

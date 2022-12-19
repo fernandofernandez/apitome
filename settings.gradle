@@ -1,12 +1,14 @@
 rootProject.name = 'apitome'
-include ':core', ':samples:reactive-app', ':samples:servlet-app'
+include ':core', ':samples:reactive-app', ':samples:servlet-app', ':samples:sor-service'
 dependencyResolutionManagement {
     versionCatalogs {
         libs {
-            version('boot', '2.6.3')
-            version('jupiter', '5.7.0')
-            library('junit-api', 'org.junit.jupiter', 'junit-jupiter-api').versionRef('jupiter')
-            library('junit-engine', 'org.junit.jupiter', 'junit-jupiter-engine').versionRef('jupiter')
+            version('spring-boot-version', '2.6.3')
+            version('jupiter-version', '5.7.0')
+            library('spring-boot-bom', 'org.springframework.boot', 'spring-boot-dependencies').versionRef('spring-boot-version')
+            library('spring-boot-starter-web', 'org.springframework.boot', 'spring-boot-starter-web').withoutVersion()
+            library('junit-api', 'org.junit.jupiter', 'junit-jupiter-api').versionRef('jupiter-version')
+            library('junit-engine', 'org.junit.jupiter', 'junit-jupiter-engine').versionRef('jupiter-version')
             bundle('junit', ['junit-api', 'junit-engine'])
         }
     }

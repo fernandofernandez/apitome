@@ -1,7 +1,7 @@
 plugins {
     id 'java'
     id 'jvm-test-suite'
-    id 'org.springframework.boot' version '2.6.3'
+    id 'org.springframework.boot' version libs.versions.spring.boot.version
 }
 
 apply plugin: 'java'
@@ -11,12 +11,14 @@ group 'org.apitome.sample.servlet'
 version '1.0.0'
 sourceCompatibility = '1.8'
 
-ext {
-    springVersion = "2.6.3"
-}
-
 repositories {
     mavenCentral()
+}
+
+dependencyManagement {
+    imports {
+        mavenBom libs.spring.boot.bom.get().toString()
+    }
 }
 
 dependencies {

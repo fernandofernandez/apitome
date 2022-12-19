@@ -7,7 +7,7 @@ plugins {
 apply plugin: 'java'
 apply plugin: 'io.spring.dependency-management'
 
-group 'org.apitome.sample.reactive'
+group 'org.apitome.sample.servlet'
 version '1.0.0'
 sourceCompatibility = '1.8'
 
@@ -22,8 +22,10 @@ dependencyManagement {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation project(':core')
+    implementation group: 'com.amazonaws', name: 'aws-java-sdk', version: '1.11.1003'
 }
 
 testing {
@@ -32,11 +34,11 @@ testing {
             useJUnitJupiter()
             dependencies {
                 implementation 'org.springframework.boot:spring-boot-starter-test'
-                implementation 'io.projectreactor:reactor-test'
                 implementation libs.bundles.junit
                 // implementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
-                // implementation 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
-                // implementation 'org.junit.vintage:junit-vintage-engine:5.7.0'
+                implementation "org.testcontainers:testcontainers:1.16.3"
+                implementation "org.testcontainers:localstack:1.16.3"
+                // runtimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.2'
             }
         }
         integrationTest(JvmTestSuite) {
