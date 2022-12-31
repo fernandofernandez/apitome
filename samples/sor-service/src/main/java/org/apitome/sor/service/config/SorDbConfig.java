@@ -37,7 +37,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 @EnableTransactionManagement
-@EnableJpaRepositories(entityManagerFactoryRef = "sorEntityManagerFactory", transactionManagerRef = "sorTransactionManager", basePackages = {"org.apitome.sor.service.account" })
+@EnableJpaRepositories(entityManagerFactoryRef = "sorEntityManagerFactory", transactionManagerRef = "sorTransactionManager", basePackages = {"org.apitome.sor.service" })
 public class SorDbConfig {
 
     @Primary
@@ -66,7 +66,7 @@ public class SorDbConfig {
     @Bean(name = "sorEntityManagerFactory")
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(EntityManagerFactoryBuilder builder,
                                                                        @Qualifier("sorDataSource") DataSource dataSource) {
-        return builder.dataSource(dataSource).packages("io.opentelemetry.example.flight").persistenceUnit("sor").build();
+        return builder.dataSource(dataSource).packages("org.apitome.sor.service").persistenceUnit("sor").build();
 
     }
 

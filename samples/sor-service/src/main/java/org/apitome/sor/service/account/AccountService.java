@@ -16,8 +16,32 @@
 
 package org.apitome.sor.service.account;
 
+import org.apitome.sor.service.repository.AccountRepository;
+import org.apitome.sor.service.model.Account;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.util.Optional;
 
 @Service
 public class AccountService {
+
+    private final AccountRepository accountRepository;
+
+    public AccountService(AccountRepository accountRepository) {
+        this.accountRepository = accountRepository;
+    }
+
+    @Transactional
+    public BigDecimal debitAccount(Long accountNumber, BigDecimal amount) {
+        Optional<Account> optionalAccount = accountRepository.findById(accountNumber);
+        Account account = optionalAccount.get();
+        BigDecimal balance = account.getBalance();
+        balance = balance.subtract(amount);
+        account.setBalance(balance);
+        accountRepository.saveAndFlush(account);
+        return balance;
+    }
 }

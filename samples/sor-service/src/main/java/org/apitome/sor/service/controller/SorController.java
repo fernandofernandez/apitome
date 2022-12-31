@@ -14,12 +14,19 @@
  * limitations under the License.
  */
 
-package org.apitome.sor.service.account.repository;
+package org.apitome.sor.service.controller;
 
-import org.apitome.sor.service.account.repository.entity.Account;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
+import org.apitome.sor.service.account.AccountService;
+import org.springframework.web.bind.annotation.RestController;
 
-@Repository
-public interface AccountRepository extends CrudRepository<Account, Long> {
+@RestController
+public class SorController {
+
+    private final AccountService accountService;
+
+    public SorController(AccountService accountService) {
+        this.accountService = accountService;
+    }
+
+
 }

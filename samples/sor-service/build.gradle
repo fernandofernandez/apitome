@@ -24,6 +24,7 @@ dependencyManagement {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.postgresql:postgresql'
     implementation project(':core')
     implementation group: 'com.amazonaws', name: 'aws-java-sdk', version: '1.11.1003'
 }
@@ -43,8 +44,12 @@ testing {
         }
         integrationTest(JvmTestSuite) {
             dependencies {
-                implementation 'io.cucumber:cucumber-java:6.10.4'
-                implementation 'io.cucumber:cucumber-junit:6.10.4'
+                implementation(project)
+                implementation 'org.springframework.boot:spring-boot-starter-web'
+                implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+                implementation "org.testcontainers:testcontainers:1.17.6"
+                implementation "org.testcontainers:postgresql:1.17.6"
+                implementation 'org.springframework.boot:spring-boot-starter-test'
                 implementation 'org.junit.vintage:junit-vintage-engine:5.7.2'
             }
         }
