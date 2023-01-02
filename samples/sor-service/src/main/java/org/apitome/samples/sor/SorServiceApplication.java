@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022. Fernando Fernandez.
+ * Copyright (c) 2022-2023. Fernando Fernandez.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,15 @@
  * limitations under the License.
  */
 
-package org.apitome.sor.service;
+package org.apitome.samples.sor;
 
-public class SorServiceApplicationTest {
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class SorServiceApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(SorServiceApplication.class, args);
+    }
 }

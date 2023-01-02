@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022. Fernando Fernandez.
+ * Copyright (c) 2022-2023. Fernando Fernandez.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package org.apitome.sor.service.repository;
+package org.apitome.samples.sor.repository;
 
-import org.apitome.sor.service.model.Account;
+import org.apitome.samples.sor.model.Account;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -27,9 +27,6 @@ import java.math.BigDecimal;
 
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Long> {
-
-    // @Query(value = "SELECT * FROM account acnt WHERE acnt.acount_number = :account_number", nativeQuery = true)
-    //Account findAccountByAccountNumber(@Param("account_number") Long accountNumber);
 
     @Modifying
     @Query(value = "UPDATE account acnt SET balance = balance - :amount WHERE acnt.account_number = :account_number RETURNING *", nativeQuery = true)

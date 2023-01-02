@@ -11,6 +11,8 @@ group 'org.apitome.sample.servlet'
 version '1.0.0'
 sourceCompatibility = '1.8'
 
+ext['junit-jupiter.version'] = '5.7.0'
+
 repositories {
     mavenCentral()
 }
@@ -36,21 +38,21 @@ testing {
             dependencies {
                 implementation 'org.springframework.boot:spring-boot-starter-test'
                 implementation libs.bundles.junit
-                // implementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
                 implementation "org.testcontainers:testcontainers:1.16.3"
                 implementation "org.testcontainers:localstack:1.16.3"
-                // runtimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.2'
             }
         }
         integrationTest(JvmTestSuite) {
+            useJUnitJupiter()
             dependencies {
                 implementation(project)
                 implementation 'org.springframework.boot:spring-boot-starter-web'
                 implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
                 implementation "org.testcontainers:testcontainers:1.17.6"
+                implementation "org.testcontainers:junit-jupiter:1.17.6"
                 implementation "org.testcontainers:postgresql:1.17.6"
                 implementation 'org.springframework.boot:spring-boot-starter-test'
-                implementation 'org.junit.vintage:junit-vintage-engine:5.7.2'
+                implementation libs.bundles.junit
             }
         }
     }

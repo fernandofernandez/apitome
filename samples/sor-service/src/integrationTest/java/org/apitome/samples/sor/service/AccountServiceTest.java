@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022. Fernando Fernandez.
+ * Copyright (c) 2022-2023. Fernando Fernandez.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package org.apitome.sor.service.account;
+package org.apitome.samples.sor.service;
 
-import org.apitome.sor.service.repository.AccountRepository;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.apitome.samples.sor.repository.AccountRepository;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,9 +26,10 @@ import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.math.BigDecimal;
 
@@ -36,15 +37,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@Sql(scripts="/init.sql")
 @ContextConfiguration(initializers = {AccountServiceTest.Initializer.class})
+@Testcontainers
 public class AccountServiceTest {
 
     @Autowired
     private AccountRepository accountRepository;
 
-    @ClassRule
-    public static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer("postgres:11.1")
+    @Container
+    public static final PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer("postgres:11.1")
             .withDatabaseName("integration-test-db")
             .withUsername("sa")
             .withPassword("sa");
@@ -56,6 +57,13 @@ public class AccountServiceTest {
     public void testDebitAccount() {
         BigDecimal balance = accountService.debitAccount(1L, new BigDecimal("100.00"));
         assertEquals(new BigDecimal("12245.670"), balance);
+    }
+
+    @Test
+    public void testDebitAccountDoesNotExist() {
+        Exception result = Assertions.assertThrows(RuntimeException.class,
+                () -> accountService.debitAccount(77L, new BigDecimal("100.00")));
+        assertEquals("Account not found", result.getMessage());
     }
 
     static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {

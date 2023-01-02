@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022. Fernando Fernandez.
+ * Copyright (c) 2022-2023. Fernando Fernandez.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.apitome.sor.service.config;
+package org.apitome.samples.sor.config;
 
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
@@ -37,7 +37,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 @EnableTransactionManagement
-@EnableJpaRepositories(entityManagerFactoryRef = "sorEntityManagerFactory", transactionManagerRef = "sorTransactionManager", basePackages = {"org.apitome.sor.service" })
+@EnableJpaRepositories(entityManagerFactoryRef = "sorEntityManagerFactory", transactionManagerRef = "sorTransactionManager", basePackages = {"org.apitome.samples.sor" })
 public class SorDbConfig {
 
     @Primary
@@ -66,7 +66,7 @@ public class SorDbConfig {
     @Bean(name = "sorEntityManagerFactory")
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(EntityManagerFactoryBuilder builder,
                                                                        @Qualifier("sorDataSource") DataSource dataSource) {
-        return builder.dataSource(dataSource).packages("org.apitome.sor.service").persistenceUnit("sor").build();
+        return builder.dataSource(dataSource).packages("org.apitome.samples.sor").persistenceUnit("sor").build();
 
     }
 

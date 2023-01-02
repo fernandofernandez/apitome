@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022. Fernando Fernandez.
+ * Copyright (c) 2022-2023. Fernando Fernandez.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,28 @@
  * limitations under the License.
  */
 
-package org.apitome.sor.service.controller;
+package org.apitome.samples.sor.service;
 
-import org.apitome.sor.service.account.AccountService;
-import org.springframework.web.bind.annotation.RestController;
+import org.apitome.samples.sor.repository.AccountRepository;
+import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.mockito.Mock;
 
-@RestController
-public class SorController {
+public class AccountServiceTest {
 
-    private final AccountService accountService;
+    @Mock
+    private AccountRepository repository;
 
-    public SorController(AccountService accountService) {
-        this.accountService = accountService;
+    private AccountService service;
+
+    @BeforeEach
+    public void setup() {
+        this.service = new AccountService(repository);
     }
 
+    @Test
+    public void test() {
+        AccountRepository repository;
 
+    }
 }

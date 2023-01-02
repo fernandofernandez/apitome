@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022. Fernando Fernandez.
+ * Copyright (c) 2022-2023. Fernando Fernandez.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package org.apitome.sor.service.model;
+package org.apitome.samples.sor.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -31,6 +30,7 @@ import java.sql.Date;
 public class Account {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "account_number")
     private Long accountNumber;
 
@@ -48,8 +48,7 @@ public class Account {
     public Account() {
     }
 
-    public Account(Long accountNumber, String accountType, BigDecimal balance, Long customerId, Date creationDate) {
-        this.accountNumber = accountNumber;
+    public Account(String accountType, BigDecimal balance, Long customerId, Date creationDate) {
         this.accountType = accountType;
         this.balance = balance;
         this.customerId = customerId;

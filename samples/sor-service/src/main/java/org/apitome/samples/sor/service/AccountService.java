@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022. Fernando Fernandez.
+ * Copyright (c) 2022-2023. Fernando Fernandez.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package org.apitome.sor.service.account;
+package org.apitome.samples.sor.service;
 
-import org.apitome.sor.service.repository.AccountRepository;
-import org.apitome.sor.service.model.Account;
-import org.springframework.data.repository.query.Param;
+import org.apitome.samples.sor.repository.AccountRepository;
+import org.apitome.samples.sor.model.Account;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +36,9 @@ public class AccountService {
     @Transactional
     public BigDecimal debitAccount(Long accountNumber, BigDecimal amount) {
         Optional<Account> optionalAccount = accountRepository.findById(accountNumber);
+        if (!optionalAccount.isPresent()) {
+            throw new RuntimeException("Account not found");
+        }
         Account account = optionalAccount.get();
         BigDecimal balance = account.getBalance();
         balance = balance.subtract(amount);
