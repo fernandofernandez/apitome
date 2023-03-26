@@ -17,8 +17,6 @@ test {
 
 dependencies {
     api 'org.slf4j:slf4j-api:1.7.36'
-    // api 'io.projectreactor.netty:reactor-netty-core:3.4.23'
-    // api 'io.projectreactor.netty:reactor-netty-http:3.4.23'
     api 'org.apache.httpcomponents:httpcore:4.4.15'
     implementation 'net.logstash.logback:logstash-logback-encoder:7.2'
     implementation 'com.fasterxml.jackson.core:jackson-core:2.13.4'
