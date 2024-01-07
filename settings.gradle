@@ -1,15 +1,28 @@
 rootProject.name = 'apitome'
-include ':core', ':samples:reactive-app', ':samples:servlet-app', ':samples:sor-service'
+include ':core', ':samples', ':samples:reactive-app', ':samples:servlet-app', ':samples:sor-service'
 dependencyResolutionManagement {
     versionCatalogs {
         libs {
-            version('spring-boot-version', '2.6.3')
-            version('jupiter-version', '5.7.0')
+            version('spring-boot-version', '2.6.8')
+            version('jupiter-version', '5.9.3')
+            version('mockito-version', '5.7.0')
+            version('wiremock-version', '3.3.1')
+            version('apache-httpcomponents-version', '5.2')
             library('spring-boot-bom', 'org.springframework.boot', 'spring-boot-dependencies').versionRef('spring-boot-version')
             library('spring-boot-starter-web', 'org.springframework.boot', 'spring-boot-starter-web').withoutVersion()
+            library('apache-httpcomponents-client', 'org.apache.httpcomponents.client5', 'httpclient5').versionRef('apache-httpcomponents-version')
+            library('apache-httpcomponents-core', 'org.apache.httpcomponents.core5', 'httpcore5').versionRef('apache-httpcomponents-version')
+            library('apache-httpcomponents-reactive', 'org.apache.httpcomponents.core5', 'httpcore5-reactive').versionRef('apache-httpcomponents-version')
+            library('apache-httpcomponents-h2', 'org.apache.httpcomponents.core5', 'httpcore5-h2').versionRef('apache-httpcomponents-version')
             library('junit-api', 'org.junit.jupiter', 'junit-jupiter-api').versionRef('jupiter-version')
-            library('junit-engine', 'org.junit.jupiter', 'junit-jupiter').versionRef('jupiter-version')
+            library('junit-engine', 'org.junit.jupiter', 'junit-jupiter-engine').versionRef('jupiter-version')
+            library('mockito-core', 'org.mockito', 'mockito-core').versionRef('mockito-version')
+            library('mockito-junit', 'org.mockito', 'mockito-junit-jupiter').versionRef('mockito-version')
+            library('wiremock-core', 'org.wiremock', 'wiremock').versionRef('wiremock-version')
+            bundle('apache-httpcomponents', ['apache-httpcomponents-client', 'apache-httpcomponents-core', 'apache-httpcomponents-reactive', 'apache-httpcomponents-h2'])
             bundle('junit', ['junit-api', 'junit-engine'])
+            bundle('mockito', ['mockito-core', 'mockito-junit'])
+            bundle('wiremock', ['wiremock-core'])
         }
     }
 }

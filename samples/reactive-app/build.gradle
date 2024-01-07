@@ -1,6 +1,5 @@
 plugins {
     id 'java'
-    id 'jvm-test-suite'
     id 'org.springframework.boot' version libs.versions.spring.boot.version
 }
 
@@ -9,10 +8,23 @@ apply plugin: 'io.spring.dependency-management'
 
 group 'org.apitome.sample.reactive'
 version '1.0.0'
-sourceCompatibility = '1.8'
+sourceCompatibility = '1.11'
+targetCompatibility = '1.11'
 
 repositories {
     mavenCentral()
+}
+
+sourceSets {
+    integrationTest {
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+}
+
+configurations {
+    integrationTestImplementation.extendsFrom implementation
+    integrationTestRuntimeOnly.extendsFrom runtimeOnly
 }
 
 dependencyManagement {
@@ -24,27 +36,28 @@ dependencyManagement {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation project(':core')
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'io.projectreactor:reactor-test'
+    testImplementation libs.bundles.junit
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    integrationTestImplementation 'io.cucumber:cucumber-java:6.10.4'
+    integrationTestImplementation 'io.cucumber:cucumber-junit:6.10.4'
+    integrationTestImplementation 'org.junit.vintage:junit-vintage-engine:5.7.2'
 }
 
-testing {
-    suites {
-        test {
-            useJUnitJupiter()
-            dependencies {
-                implementation 'org.springframework.boot:spring-boot-starter-test'
-                implementation 'io.projectreactor:reactor-test'
-                implementation libs.bundles.junit
-                // implementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
-                // implementation 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
-                // implementation 'org.junit.vintage:junit-vintage-engine:5.7.0'
-            }
-        }
-        integrationTest(JvmTestSuite) {
-            dependencies {
-                implementation 'io.cucumber:cucumber-java:6.10.4'
-                implementation 'io.cucumber:cucumber-junit:6.10.4'
-                implementation 'org.junit.vintage:junit-vintage-engine:5.7.2'
-            }
-        }
+tasks.register('integrationTest', Test) {
+    description = 'Runs integration tests.'
+    group = 'verification'
+
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    shouldRunAfter test
+
+    useJUnitPlatform()
+
+    testLogging {
+        events "passed"
     }
 }

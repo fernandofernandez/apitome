@@ -1,6 +1,5 @@
 plugins {
     id 'java'
-    id 'jvm-test-suite'
     id 'org.springframework.boot' version libs.versions.spring.boot.version
 }
 
@@ -9,7 +8,8 @@ apply plugin: 'io.spring.dependency-management'
 
 group 'org.apitome.sample.servlet'
 version '1.0.0'
-sourceCompatibility = '1.8'
+sourceCompatibility = '1.11'
+targetCompatibility = '1.11'
 
 ext['junit-jupiter.version'] = '5.7.0'
 
@@ -23,37 +23,52 @@ dependencyManagement {
     }
 }
 
+sourceSets {
+    integrationTest {
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+}
+
+configurations {
+    integrationTestImplementation.extendsFrom implementation
+    integrationTestRuntimeOnly.extendsFrom runtimeOnly
+}
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.postgresql:postgresql'
     implementation project(':core')
     implementation group: 'com.amazonaws', name: 'aws-java-sdk', version: '1.11.1003'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation libs.bundles.junit
+    testImplementation "org.testcontainers:testcontainers:1.16.3"
+    testImplementation "org.testcontainers:localstack:1.16.3"
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    integrationTestImplementation(project)
+    integrationTestImplementation 'org.springframework.boot:spring-boot-starter-web'
+    integrationTestImplementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    integrationTestImplementation "org.testcontainers:testcontainers:1.17.6"
+    integrationTestImplementation "org.testcontainers:junit-jupiter:1.17.6"
+    integrationTestImplementation "org.testcontainers:postgresql:1.17.6"
+    integrationTestImplementation 'org.springframework.boot:spring-boot-starter-test'
+    // implementation libs.bundles.junit
 }
 
-testing {
-    suites {
-        test {
-            useJUnitJupiter()
-            dependencies {
-                implementation 'org.springframework.boot:spring-boot-starter-test'
-                implementation libs.bundles.junit
-                implementation "org.testcontainers:testcontainers:1.16.3"
-                implementation "org.testcontainers:localstack:1.16.3"
-            }
-        }
-        integrationTest(JvmTestSuite) {
-            useJUnitJupiter()
-            dependencies {
-                implementation(project)
-                implementation 'org.springframework.boot:spring-boot-starter-web'
-                implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-                implementation "org.testcontainers:testcontainers:1.17.6"
-                implementation "org.testcontainers:junit-jupiter:1.17.6"
-                implementation "org.testcontainers:postgresql:1.17.6"
-                implementation 'org.springframework.boot:spring-boot-starter-test'
-                implementation libs.bundles.junit
-            }
-        }
+tasks.register('integrationTest', Test) {
+    description = 'Runs integration tests.'
+    group = 'verification'
+
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    shouldRunAfter test
+
+    useJUnitPlatform()
+
+    testLogging {
+        events "passed"
     }
 }

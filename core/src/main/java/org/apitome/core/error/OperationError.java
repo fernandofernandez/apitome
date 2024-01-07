@@ -11,6 +11,7 @@ public enum OperationError implements ErrorCode {
     OperationError(String id) {
         this.id = id;
     }
+
     @Override
     public String getId() {
         return id;
