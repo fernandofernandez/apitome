@@ -1,0 +1,13 @@
+{
+  "type": "complex",
+  "configurationMap": {
+    "integer": {
+      "intValue": 11,
+      "strValue": "zzzzzzz"
+    },
+    "integer": {
+      "intValue": 17,
+      "strValue": "wwwwwww"
+    }
+  }
+}

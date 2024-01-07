@@ -1,0 +1,4 @@
+type: simple
+operationConfig:
+  intValue: 2
+  strValue: "xxxxx"
