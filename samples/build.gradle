@@ -17,6 +17,7 @@ dependencies {
     testImplementation platform('io.cucumber:cucumber-bom:7.15.0')
     testImplementation platform('org.junit:junit-bom:5.10.1')
     testImplementation('io.cucumber:cucumber-java')
+    testImplementation('io.cucumber:cucumber-junit')
     testImplementation('io.cucumber:cucumber-junit-platform-engine')
     testImplementation('org.junit.platform:junit-platform-suite')
     testImplementation('org.junit.jupiter:junit-jupiter')
