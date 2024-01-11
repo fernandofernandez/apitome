@@ -11,6 +11,7 @@ import org.apitome.core.service.TestIntegerService;
 import org.apitome.core.service.TestStringService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import java.net.SocketTimeoutException;
 import java.util.concurrent.ExecutionException;
@@ -21,8 +22,8 @@ import static org.apitome.core.service.TestIntegerService.INTEGER_SERVICE;
 import static org.apitome.core.service.TestStringService.STRING_SERVICE;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
 
 public class OperationTest extends OperationTestBase {
 
@@ -61,7 +62,9 @@ public class OperationTest extends OperationTestBase {
     public void testNormalOperation() {
         request.setIntValue(7);
         request.setStrValue("Fernando");
+        System.out.println("Executing operation....");
         TestResponse result = operation.execute(request, context);
+        System.out.println("Operation executed.");
         assertEquals(107, result.getIntValue());
         assertEquals("Hello Fernando", result.getStrValue());
     }
@@ -83,7 +86,7 @@ public class OperationTest extends OperationTestBase {
         SocketTimeoutException timeout = new SocketTimeoutException("mock socket timeout");
         RuntimeException rte = new RuntimeException(timeout);
         // Mockito cannot throw checked exceptions so we use a RuntimeException
-        when(integerService.sumIntegers(any())).thenThrow(rte);
+        doThrow(rte).when(integerService).sumIntegers(any(), any());
         AtomicBoolean timeoutHandlerInvoked = new AtomicBoolean(false);
         this.timeoutHandler = (a, e) -> {timeoutHandlerInvoked.set(true); throw a.handleException(e);};
         ServiceException result = assertException(operation, request, context, ServiceException.class);
@@ -97,7 +100,7 @@ public class OperationTest extends OperationTestBase {
         TestIntegerService integerService = mock(TestIntegerService.class);
         serviceManager.addService(INTEGER_SERVICE, integerService);
         IllegalArgumentException iae = new IllegalArgumentException();
-        when(integerService.sumIntegers(any())).thenThrow(iae);
+        doThrow(iae).when(integerService).sumIntegers(any(), any());
         AtomicBoolean timeoutHandlerInvoked = new AtomicBoolean(false);
         AtomicBoolean exceptionHandlerInvoked = new AtomicBoolean(false);
         this.timeoutHandler = (a, e) -> {timeoutHandlerInvoked.set(true); throw a.handleException(e);};
@@ -115,7 +118,7 @@ public class OperationTest extends OperationTestBase {
         SocketTimeoutException timeout = new SocketTimeoutException("mock socket timeout");
         RuntimeException rte = new RuntimeException(timeout);
         // Mockito cannot throw checked exceptions so we use a RuntimeException
-        when(stringService.appendStrings(any())).thenThrow(rte);
+        doThrow(rte).when(stringService).appendStrings(any(), any());
         AtomicBoolean timeoutHandlerInvoked = new AtomicBoolean(false);
         this.timeoutHandler = (a, e) -> {timeoutHandlerInvoked.set(true); throw a.handleException(e);};
         this.runAsync = true;
@@ -129,11 +132,14 @@ public class OperationTest extends OperationTestBase {
 
     @Test
     public void testExceptionInAsyncOperation() {
-        TestStringService stringService = mock(TestStringService.class);
-        serviceManager.addService(STRING_SERVICE, stringService);
+        TestStringService mockStringService = Mockito.mock(TestStringService.class, Mockito.withSettings().verboseLogging());
+        System.out.println("Mock service obj: " + mockStringService.getClass().getCanonicalName());
+        System.out.println("Existing service: " + serviceManager.getService(STRING_SERVICE).getClass().getCanonicalName());
+        serviceManager.addService(STRING_SERVICE, mockStringService);
+        System.out.println("Mock service: " + serviceManager.getService(STRING_SERVICE).getClass().getCanonicalName());
         IllegalArgumentException iae = new IllegalArgumentException();
         // Mockito cannot throw checked exceptions so we use a RuntimeException
-        when(stringService.appendStrings(any())).thenThrow(iae);
+        doThrow(iae).when(mockStringService).appendStrings(anyString(), anyString());
         AtomicBoolean timeoutHandlerInvoked = new AtomicBoolean(false);
         AtomicBoolean exceptionHandlerInvoked = new AtomicBoolean(false);
         this.timeoutHandler = (a, e) -> {timeoutHandlerInvoked.set(true); throw a.handleException(e);};
@@ -167,6 +173,7 @@ public class OperationTest extends OperationTestBase {
             TestResponse response = new TestResponse();
             response.setIntValue(intValue);
             response.setStrValue(strValue);
+            System.out.println("Returning response...");
             return response;
         }
 
@@ -222,9 +229,10 @@ public class OperationTest extends OperationTestBase {
         }
     }
 
-    public class TestActionOne extends AbstractAction<TestRequest, Integer> {
+    public static class TestActionOne extends AbstractAction<TestRequest, Integer> {
         @Override
         public Integer invoke(TestRequest testRequest, Context context) throws TimeoutException, SocketTimeoutException {
+            System.out.println("Invoking service " + INTEGER_SERVICE.getName());
             try {
                 return invokeService(INTEGER_SERVICE, s -> s.sumIntegers(testRequest.getIntValue(), 100));
             } catch (Exception e) {
@@ -245,9 +253,10 @@ public class OperationTest extends OperationTestBase {
         }
     }
 
-    public class TestActionTwo extends AbstractAction<TestRequest, String> {
+    public static class TestActionTwo extends AbstractAction<TestRequest, String> {
         @Override
         public String invoke(TestRequest testRequest, Context context) throws TimeoutException, SocketTimeoutException {
+            System.out.println("Invoking service " + STRING_SERVICE.getName());
             try {
                 return invokeService(STRING_SERVICE, s -> s.appendStrings("Hello ", testRequest.getStrValue()));
             } catch (Exception e) {

@@ -9,7 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.mockito.junit.jupiter.MockitoExtension;
+// import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
@@ -18,7 +18,7 @@ import reactor.test.StepVerifier;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 
-@ExtendWith(MockitoExtension.class)
+// @ExtendWith(MockitoExtension.class)
 public class SimpleServiceTest {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());

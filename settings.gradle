@@ -4,7 +4,7 @@ dependencyResolutionManagement {
     versionCatalogs {
         libs {
             version('spring-boot-version', '2.6.8')
-            version('jupiter-version', '5.9.3')
+            version('jupiter-version', '5.10.0')
             version('mockito-version', '5.7.0')
             version('wiremock-version', '3.3.1')
             version('apache-httpcomponents-version', '5.2')
@@ -21,7 +21,7 @@ dependencyResolutionManagement {
             library('wiremock-core', 'org.wiremock', 'wiremock').versionRef('wiremock-version')
             bundle('apache-httpcomponents', ['apache-httpcomponents-client', 'apache-httpcomponents-core', 'apache-httpcomponents-reactive', 'apache-httpcomponents-h2'])
             bundle('junit', ['junit-api', 'junit-engine'])
-            bundle('mockito', ['mockito-core', 'mockito-junit'])
+            bundle('mockito', ['mockito-core'])
             bundle('wiremock', ['wiremock-core'])
         }
     }

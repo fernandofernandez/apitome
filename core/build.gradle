@@ -35,6 +35,7 @@ dependencies {
     testImplementation libs.bundles.junit
     testImplementation libs.bundles.mockito
     testImplementation libs.bundles.wiremock
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     // Logback version | JDK |       Enterprise Edition         |
     // ----------------+-----+----------------------------------+
     //     1.3.x       |  8  |  Java EE (javax.* namespace)     |
