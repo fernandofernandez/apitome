@@ -62,9 +62,7 @@ public class OperationTest extends OperationTestBase {
     public void testNormalOperation() {
         request.setIntValue(7);
         request.setStrValue("Fernando");
-        System.out.println("Executing operation....");
         TestResponse result = operation.execute(request, context);
-        System.out.println("Operation executed.");
         assertEquals(107, result.getIntValue());
         assertEquals("Hello Fernando", result.getStrValue());
     }
@@ -132,12 +130,9 @@ public class OperationTest extends OperationTestBase {
 
     @Test
     public void testExceptionInAsyncOperation() {
-        TestStringService mockStringService = Mockito.mock(TestStringService.class, Mockito.withSettings().verboseLogging());
-        System.out.println("Mock service obj: " + mockStringService.getClass().getCanonicalName());
-        System.out.println("Existing service: " + serviceManager.getService(STRING_SERVICE).getClass().getCanonicalName());
+        TestStringService mockStringService = Mockito.mock(TestStringService.class);
         serviceManager.addService(STRING_SERVICE, mockStringService);
-        System.out.println("Mock service: " + serviceManager.getService(STRING_SERVICE).getClass().getCanonicalName());
-        IllegalArgumentException iae = new IllegalArgumentException();
+        IllegalArgumentException iae = new IllegalArgumentException("Mock exception");
         // Mockito cannot throw checked exceptions so we use a RuntimeException
         doThrow(iae).when(mockStringService).appendStrings(anyString(), anyString());
         AtomicBoolean timeoutHandlerInvoked = new AtomicBoolean(false);
@@ -173,7 +168,6 @@ public class OperationTest extends OperationTestBase {
             TestResponse response = new TestResponse();
             response.setIntValue(intValue);
             response.setStrValue(strValue);
-            System.out.println("Returning response...");
             return response;
         }
 
@@ -232,7 +226,6 @@ public class OperationTest extends OperationTestBase {
     public static class TestActionOne extends AbstractAction<TestRequest, Integer> {
         @Override
         public Integer invoke(TestRequest testRequest, Context context) throws TimeoutException, SocketTimeoutException {
-            System.out.println("Invoking service " + INTEGER_SERVICE.getName());
             try {
                 return invokeService(INTEGER_SERVICE, s -> s.sumIntegers(testRequest.getIntValue(), 100));
             } catch (Exception e) {
@@ -256,7 +249,6 @@ public class OperationTest extends OperationTestBase {
     public static class TestActionTwo extends AbstractAction<TestRequest, String> {
         @Override
         public String invoke(TestRequest testRequest, Context context) throws TimeoutException, SocketTimeoutException {
-            System.out.println("Invoking service " + STRING_SERVICE.getName());
             try {
                 return invokeService(STRING_SERVICE, s -> s.appendStrings("Hello ", testRequest.getStrValue()));
             } catch (Exception e) {

@@ -51,10 +51,7 @@ public interface ServiceManager extends LoggerAware {
             throw new IllegalArgumentException("Service '" + serviceName + "' is not hosted in this ServiceManager");
         }
         try {
-            System.out.println("Calling service " + service.getClass().getCanonicalName());
-            R result = command.run(service);
-            System.out.println("Result from service " + serviceName + " = " + result);
-            return result;
+            return command.run(service);
         } catch (Exception e) {
             long elapsedTime = System.currentTimeMillis() - start;
             LogFields logFields = LogFields.builder(SERVICE_EXCEPTION)

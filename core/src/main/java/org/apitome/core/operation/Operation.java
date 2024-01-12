@@ -133,7 +133,6 @@ public interface Operation<Request, Response> extends LoggerAware {
     default <Result> Result performAction(ActionKey<Result> actionKey, Request request, Context context,
                                           ExceptionHandler timeoutHandler, ExceptionHandler errorHandler) {
         Action<Request, Result> action = getAction(actionKey);
-        System.out.println("Performing action " + action.getClass().getCanonicalName());
         return action.perform(request, context, timeoutHandler, errorHandler);
     }
 

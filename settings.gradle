@@ -21,7 +21,7 @@ dependencyResolutionManagement {
             library('wiremock-core', 'org.wiremock', 'wiremock').versionRef('wiremock-version')
             bundle('apache-httpcomponents', ['apache-httpcomponents-client', 'apache-httpcomponents-core', 'apache-httpcomponents-reactive', 'apache-httpcomponents-h2'])
             bundle('junit', ['junit-api', 'junit-engine'])
-            bundle('mockito', ['mockito-core'])
+            bundle('mockito', ['mockito-core', 'mockito-junit'])
             bundle('wiremock', ['wiremock-core'])
         }
     }

@@ -1,7 +1,0 @@
-{
-  "type": "${propertyOne}",
-  "operationConfig": {
-    "intValue": 3,
-    "strValue": "#{propertyTwo}"
-  }
-}
